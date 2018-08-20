@@ -90,7 +90,7 @@ define(function (require) {
             videoEl.appendChild(node);
         });
         // add log
-       /* log.bind(videoEl);*/
+        log.bind(videoEl);
         this.element.appendChild(videoEl);
         return videoEl;
     };
