@@ -9,11 +9,10 @@ define(function (require) {
     var md5 = require('./md5.min');
     var util = require('util');
     var platform = util.platform;
-    /*var platform = require('./platform');*/
-    var videoLog =  {
-    	status: {
-        	init: false,
-        	waiting: false
+    var videoLog = {
+        status: {
+            init: false,
+            waiting: false
         },
         time: {
             play: 0,
@@ -143,152 +142,6 @@ define(function (require) {
                 self.sendLog('section', data);
             });
         },
-	getNetwork() {
-		var self = this;
-		var ua = videoLog.ua;
-		var isSearchCraft = /SearchCraft/i.test(navigator.userAgent); 
-		if (isSearchCraft) {
-			self.getNetworkSearchCraft();
-		} else if (ua.isBaiduApp()) {
-			self.getNetworkBaidubox();
-		}
-    	},
-        // 简单搜索版本号
-        secrVersion: function () {
-	    var ua = navigator.userAgent;
-            var match = ua.match(/ SearchCraft\/([0-9]+_)?([0-9.]+)/i);
-            var version = /(iPhone|iPod|iPad)/.test(ua) ? match[2].split('.') : match[2].split('.');
-            return version ? version.map(parseFloat) : [];
-        },
-	/**
-	 * 将当前简单版本跟目标版本的版本号进行对比
-	 *
-	 * @param {String} version 目标版本
-	 * @return {Booleans} true/false true表示当前版本>=目标版本，false表示当前版本<目标版本
-	 */
-	versionCompare(version) {
-		var curVer = 0;
-		var destVer = 0;
-		var secrVersion = this.secrVersion();
-		var destVersion = version.split('.');
-		for (var i = 0, l = secrVersion.length; i < l; i++) {
-			curVer += secrVersion[i];
-		}
-		for (var j = 0, m = destVersion.length; j < m; j++) {
-			destVer += (destVersion[j] - 0);
-		}
-		if (curVer < destVer) {
-			return false;
-		} else {
-			return true;
-		}
-	},
-	/*获取手百的网络状态*/
-	getNetworkBaidubox() {
-		location.assign(videoLog.getNetworkType);
-	},
-	/*获取简单的网络状态*/
-	getNetworkSearchCraft() {
-		var self = this;
-		var ua = videoLog.ua;
-		if (!ua.isSearchCraft() || ua.isSearchCraft() && !self.versionCompare('2.9')) return;
-		var msg = {
-			func: "invokeModule",
-      			moduleName: "Utility",
-      			options :{
-				action: "network"   // 获取网络状态
-      			},
-			callback: "searchcraftWifiCb"
-		}
-		if (window.Viaduct && window.Viaduct.postMessage) {
-			ua.isAndroid() ? window.Viaduct.postMessage(JSON.stringify(msg)) : window.Viaduct.postMessage(msg);
-		}
-		window.searchcraftWifiCb = function(param) {
-			if (param.status == 0 && param.data && param.data.network) {
-				videoLog.network = param.data.network;
-			}
-		}
-	},
-	//获取dns解析和建连时间
-	getDnsConnect() {
-		/*查下performance api浏览器是否支持*/
-		if (typeof window.performance == 'undefined' || typeof window.performance.getEntriesByType == 'undefined') {
-			videoLog.expand.loadplayer_2_dns = -1;
-			videoLog.expand.dns_2_connect = -1;
-			return;
-		}
-		var resources = window.performance.getEntriesByType('resource');
-		for(var i = 0, l = resources.length; i < l; i++) {
-			if (resources[i].name.match(/^https:\/\/vdse.bdstatic.com/) ||
-					resources[i].name.match(/^https:\/\/vd1.bdstatic.com/) ||
-					resources[i].name.match(/^https:\/\/vd2.bdstatic.com/) ||
-					resources[i].name.match(/^https:\/\/vd3.bdstatic.com/) ||
-					resources[i].name.match(/^https:\/\/vd4.bdstatic.com/)) {
-				videoLog.expand.loadplayer_2_dns = resources[i]['domainLookupEnd'] - resources[i]['domainLookupStart'];
-				videoLog.expand.dns_2_connect = resources[i]['connectEnd'] - resources[i]['connectStart'];
-				break;
-			}
-		}
-	},
-	/**
-	 * 获取播放过程中的各种时长
-	 * @param {Number} time 视频播放时机
-	 */
-	getPlayExpand(time) {
-		videoLog.expand.connect_2_loadstart = videoLog.time.loadstart - (videoLog.time.play + videoLog.expand.loadplayer_2_dns + videoLog.expand.dns_2_connect);
-		//to check loadstart和play的时机谁先谁后
-		videoLog.expand.loadplayer_2_loadstart = videoLog.time.loadstart - videoLog.time.play;
-		videoLog.expand.loadstart_2_loadmetadata = videoLog.time.loadedmetadata-videoLog.time.loadstart;
-		videoLog.expand.loadmetadata_2_loadeddata = videoLog.time.loadeddata-videoLog.time.loadedmetadata;
-		videoLog.expand.loadeddata_2_playing = time - videoLog.time.loadeddata;
-		videoLog.expand.loadplayer_2_playing = time - videoLog.time.play;
-	},
-	createLogDebug() {
-		var str = '' +
-			'loadplayer_2_dns:' + videoLog.expand.loadplayer_2_dns + '<br/>' +
-			'dns_2_connect: ' + videoLog.expand.dns_2_connect + '<br/>' +
-			'connect_2_loadstart: ' + videoLog.expand.connect_2_loadstart + '<br/>' +
-			'loadplayer_2_loadstart: ' + videoLog.expand.loadplayer_2_loadstart + '<br/>' +
-			'loadstart_2_loadmetadata: ' + videoLog.expand.loadstart_2_loadmetadata + '<br/>' +
-			'loadmetadata_2_loadeddata: ' + videoLog.expand.loadmetadata_2_loadeddata + '<br/>' +
-			'loadeddata_2_playing: ' + videoLog.expand.loadeddata_2_playing + '<br/>' +
-			'loadplayer_2_playing: ' + videoLog.expand.loadplayer_2_playing + '<br/>';
-		if (!document.querySelector('#videoLogDebug')) {
-			var ele = document.createElement('div'); 
-			ele.style.cssText = 'position:fixed;z-index:1001; top:0;left:0;background-color:green;z-index:1000;text-align:left;overflow:scroll;';
-			ele.id = 'videoLogDebug'; 
-			ele.innerHTML = str;
-			document.body.appendChild(ele);
-		} else {
-			document.querySelector('#videoLogDebug').innerHTML = str;
-		}
-	},
-	getPlayTime(data) {
-		var self = this;
-		videoLog.status.init = true;
-		self.getDnsConnect();
-		var playTime = videoLog.time.play;
-		/*短视频落地页页面加载的时候就试图自动播放视频，会调用video的loadstart*/
-		if (videoLog.time.loadstart < playTime) {
-			videoLog.time.loadstart = playTime;
-			videoLog.time.play = videoLog.time.loadstart - (videoLog.expand.loadplayer_2_dns + videoLog.expand.dns_2_connect);
-		}
-		if (videoLog.time.loadedmetadata < playTime) {
-			videoLog.time.loadedmetadata = videoLog.time.loadstart;
-		}
-		if (videoLog.time.loadeddata < playTime && videoLog.time.loadeddata > 0) {
-			videoLog.time.loadeddata = videoLog.time.loadedmetadata;
-		}
-
-		/*有一些浏览器不支持loadeddata，活着loadeddata执行的时机晚于playing*/
-		if (videoLog.time.loadeddata === 0) {
-			videoLog.time.loadeddata = +new Date();
-		}
-		var time = +new Date();
-		self.getPlayExpand(time);
-		self.createLogDebug();
-		self.sendLog('play', data);
-	},
         /**
          * Send log function
          * @param {string} type event type
@@ -299,7 +152,7 @@ define(function (require) {
             var time = '';
             switch (type) {
                 case 'play':
-		            var expand = videoLog.expand;
+		            let expand = videoLog.expand;
         		    // Send log when first time start play
         		    self.webb2.sendPfLog(
                     //info

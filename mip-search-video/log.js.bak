@@ -144,9 +144,9 @@ define(function (require) {
             });
         },
 	getNetwork() {
-		var self = this;
-		var ua = videoLog.ua;
-		var isSearchCraft = /SearchCraft/i.test(navigator.userAgent); 
+		let self = this;
+		let ua = videoLog.ua;
+		let isSearchCraft = /SearchCraft/i.test(navigator.userAgent); 
 		if (isSearchCraft) {
 			self.getNetworkSearchCraft();
 		} else if (ua.isBaiduApp()) {
@@ -155,7 +155,7 @@ define(function (require) {
     	},
         // 简单搜索版本号
         secrVersion: function () {
-	    var ua = navigator.userAgent;
+	    let ua = navigator.userAgent;
             var match = ua.match(/ SearchCraft\/([0-9]+_)?([0-9.]+)/i);
             var version = /(iPhone|iPod|iPad)/.test(ua) ? match[2].split('.') : match[2].split('.');
             return version ? version.map(parseFloat) : [];
@@ -167,14 +167,14 @@ define(function (require) {
 	 * @return {Booleans} true/false true表示当前版本>=目标版本，false表示当前版本<目标版本
 	 */
 	versionCompare(version) {
-		var curVer = 0;
-		var destVer = 0;
-		var secrVersion = this.secrVersion();
-		var destVersion = version.split('.');
-		for (var i = 0, l = secrVersion.length; i < l; i++) {
+		let curVer = 0;
+		let destVer = 0;
+		let secrVersion = this.secrVersion();
+		let destVersion = version.split('.');
+		for (let i = 0, l = secrVersion.length; i < l; i++) {
 			curVer += secrVersion[i];
 		}
-		for (var j = 0, m = destVersion.length; j < m; j++) {
+		for (let j = 0, m = destVersion.length; j < m; j++) {
 			destVer += (destVersion[j] - 0);
 		}
 		if (curVer < destVer) {
@@ -189,10 +189,10 @@ define(function (require) {
 	},
 	/*获取简单的网络状态*/
 	getNetworkSearchCraft() {
-		var self = this;
-		var ua = videoLog.ua;
+		let self = this;
+		let ua = videoLog.ua;
 		if (!ua.isSearchCraft() || ua.isSearchCraft() && !self.versionCompare('2.9')) return;
-		var msg = {
+		let msg = {
 			func: "invokeModule",
       			moduleName: "Utility",
       			options :{
@@ -254,7 +254,7 @@ define(function (require) {
 			'loadeddata_2_playing: ' + videoLog.expand.loadeddata_2_playing + '<br/>' +
 			'loadplayer_2_playing: ' + videoLog.expand.loadplayer_2_playing + '<br/>';
 		if (!document.querySelector('#videoLogDebug')) {
-			var ele = document.createElement('div'); 
+			let ele = document.createElement('div'); 
 			ele.style.cssText = 'position:fixed;z-index:1001; top:0;left:0;background-color:green;z-index:1000;text-align:left;overflow:scroll;';
 			ele.id = 'videoLogDebug'; 
 			ele.innerHTML = str;
@@ -264,7 +264,7 @@ define(function (require) {
 		}
 	},
 	getPlayTime(data) {
-		var self = this;
+		let self = this;
 		videoLog.status.init = true;
 		self.getDnsConnect();
 		var playTime = videoLog.time.play;
@@ -299,7 +299,7 @@ define(function (require) {
             var time = '';
             switch (type) {
                 case 'play':
-		            var expand = videoLog.expand;
+		            let expand = videoLog.expand;
         		    // Send log when first time start play
         		    self.webb2.sendPfLog(
                     //info
