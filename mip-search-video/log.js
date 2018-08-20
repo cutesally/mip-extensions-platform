@@ -326,14 +326,22 @@ define(function (require) {
                     });
                     break;
                 case 'section':
-                    self.webb2.send('pf_comm', {
-                        cent: data.cent,
-                        currentTime: data.currentTime,
-                        url: data.url,
-                        videoSrc: data.videoSrc
-                    }, function () {}, {
-                        group: 'searchVideo-mip'
-                    });
+                    self.webb2.sendPfLog(
+                        //info
+                        {
+                            cent: data.cent
+                        },
+                        //dim
+                        {
+                            net: videoLog.network,
+                            type: 'thirdparty-cent'
+                        },
+                        //ext
+                        {
+                            ext: {
+                                videoSrc: data.videoSrc
+                             }
+                        });
                     break;
             }
         }
