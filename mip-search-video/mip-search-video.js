@@ -26,7 +26,6 @@ define(function (require) {
     var windowInIframe = viewer.isIframed;
 
     customElem.prototype.firstInviewCallback = function () {
-alert(1);
         this.attributes = getAttributeSet(this.element.attributes);
         this.sourceDoms = this.element.querySelectorAll('source');
         if (this.attributes.src) {
@@ -69,7 +68,6 @@ alert(1);
 
     // Render the `<video>` element, and append to `this.element`
     customElem.prototype.renderInView = function () {
-alert(2);
         var videoEl = document.createElement('video');
         for (var k in this.attributes) {
             if (this.attributes.hasOwnProperty(k) && videoAttributes.indexOf(k) > -1) {
@@ -100,7 +98,6 @@ alert(2);
 
     // Render the `<a>` element with poster and play btn, and append to `this.element`
     customElem.prototype.renderPlayElsewhere = function () {
-alert(3);
         var videoEl = document.createElement('div');
         var urlSrc;
         videoEl.setAttribute('class', 'mip-search-video-poster');
@@ -144,6 +141,18 @@ alert(3);
         this.element.appendChild(videoEl);
         return videoEl;
     };
+    /**
+     * Get attribute Set from attribute List
+     *
+     * @param {NamedNodeMap} attributes the attribute list, spec: https://dom.spec.whatwg.org/#interface-namednodemap
+     * @return {Object} the attribute set, legacy:
+     * @example
+     * {
+     *     "src": "http://xx.mp4",
+     *     "autoplay": "",
+     *     "width": "720"
+     * }
+     */
     function getAttributeSet(attributes) {
  	var attrs = {};
 	for (var i = 0, l = attributes.length; i < l; i++) {
