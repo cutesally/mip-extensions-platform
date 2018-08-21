@@ -9,7 +9,6 @@ define(function (require) {
     var md5 = require('./md5.min');
     var util = require('util');
     var platform = util.platform;
-    /*var platform = require('./platform');*/
     var videoLog =  {
     	status: {
         	init: false,
@@ -71,7 +70,7 @@ define(function (require) {
         bind: function (videoEl) {
             var self = this;
             self.init();
-	        /*self.getNetwork();*/
+	    self.getNetwork();
     	    window.videoPageGetNetworkType = function (data) {
     		    var data = JSON.parse(data);
     		    if (data && !parseInt(data.status, 10) && data.data) {
@@ -255,7 +254,7 @@ define(function (require) {
 			'loadplayer_2_playing: ' + videoLog.expand.loadplayer_2_playing + '<br/>';
 		if (!document.querySelector('#videoLogDebug')) {
 			var ele = document.createElement('div'); 
-			ele.style.cssText = 'position:fixed;z-index:1001; top:0;left:0;background-color:green;z-index:1000;text-align:left;overflow:scroll;';
+			ele.style.cssText = 'position:fixed;z-index:1001; top:240px;left:0;background-color:green;z-index:1000;text-align:left;overflow:scroll;';
 			ele.id = 'videoLogDebug'; 
 			ele.innerHTML = str;
 			document.body.appendChild(ele);

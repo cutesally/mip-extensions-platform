@@ -26,6 +26,7 @@ define(function (require) {
     var windowInIframe = viewer.isIframed;
 
     customElem.prototype.firstInviewCallback = function () {
+alert(1);
         this.attributes = getAttributeSet(this.element.attributes);
         this.sourceDoms = this.element.querySelectorAll('source');
         if (this.attributes.src) {
@@ -42,11 +43,12 @@ define(function (require) {
         if (!this.sourceDoms.length) {
             sourceIsHttps = false;
         }
-        Array.prototype.slice.apply(this.sourceDoms).forEach(function (node) {
-            if (!node.src.match(/^https:|^\/\//)) {
-                sourceIsHttps = false;
-            }
-        });
+	for (var i = 0, l = this.sourceDoms.length; i < l; i++) {
+		var node = this.sourceDoms[i];
+            	if (!node.src.match(/^https:|^\/\//)) {
+                	sourceIsHttps = false;
+            	}
+	}
         var videoProHttps = (this.src && this.src.match(/^https:|^\/\//))
                             || (this.sourceDoms && sourceIsHttps);
 
@@ -67,6 +69,7 @@ define(function (require) {
 
     // Render the `<video>` element, and append to `this.element`
     customElem.prototype.renderInView = function () {
+alert(2);
         var videoEl = document.createElement('video');
         for (var k in this.attributes) {
             if (this.attributes.hasOwnProperty(k) && videoAttributes.indexOf(k) > -1) {
@@ -82,13 +85,13 @@ define(function (require) {
         videoEl.setAttribute('playsinline', 'playsinline');
         videoEl.setAttribute('webkit-playsinline', 'webkit-playsinline');
 
-        Array.prototype.slice.apply(this.element.childNodes).forEach(function (node) {
-            // FIXME: mip layout related, remove this!
-            if (node.nodeName.toLowerCase() === 'mip-i-space') {
-                return;
-            }
-            videoEl.appendChild(node);
-        });
+	for (var i = 0, l = this.element.childNodes.length; i < l; i++) {
+		var node = this.element.childNodes[i];
+            	if (node.nodeName.toLowerCase() === 'mip-i-space') {
+                	return;
+            	}
+            	videoEl.appendChild(node);
+	}
         // add log
         log.bind(videoEl);
         this.element.appendChild(videoEl);
@@ -97,6 +100,7 @@ define(function (require) {
 
     // Render the `<a>` element with poster and play btn, and append to `this.element`
     customElem.prototype.renderPlayElsewhere = function () {
+alert(3);
         var videoEl = document.createElement('div');
         var urlSrc;
         videoEl.setAttribute('class', 'mip-search-video-poster');
@@ -114,11 +118,12 @@ define(function (require) {
 
         // make sourceList, send to outer iframe
         var sourceList = [];
-        Array.prototype.slice.apply(this.sourceDoms).forEach(function (node) {
-            var obj = {};
-            obj[node.type] = node.src;
-            sourceList.push(obj);
-        });
+	for (var i = 0, l = this.sourceDoms.length; i < l; i++) {
+		var node = this.sourceDoms[i];
+            	var obj = {};
+            	obj[node.type] = node.src;
+            	sourceList.push(obj);
+	}
 
         if (!sourceList.length) {
             urlSrc = videoEl.dataset.videoSrc;
@@ -139,25 +144,13 @@ define(function (require) {
         this.element.appendChild(videoEl);
         return videoEl;
     };
-
-    /**
-     * Get attribute Set from attribute List
-     *
-     * @param {NamedNodeMap} attributes the attribute list, spec: https://dom.spec.whatwg.org/#interface-namednodemap
-     * @return {Object} the attribute set, legacy:
-     * @example
-     * {
-     *     "src": "http://xx.mp4",
-     *     "autoplay": "",
-     *     "width": "720"
-     * }
-     */
     function getAttributeSet(attributes) {
-        var attrs = {};
-        Array.prototype.slice.apply(attributes).forEach(function (attr) {
-            attrs[attr.name] = attr.value;
-        });
-        return attrs;
+ 	var attrs = {};
+	for (var i = 0, l = attributes.length; i < l; i++) {
+		var attr = attributes[i];
+            	attrs[attr.name] = attr.value;
+	}
+        return attrs;       
     }
 
     return customElem;
