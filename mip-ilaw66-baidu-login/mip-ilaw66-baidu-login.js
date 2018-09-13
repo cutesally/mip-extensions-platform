@@ -27,11 +27,50 @@ define(function (require) {
         var head = $el.find('.header_block');
         var t1;
         var phoneChangedFlagAndHasOrderUnpaid = false;
-
         var channelInUrl = getQueryString('channel');
+        var MIP = window.MIP;
         if (!channel && channelInUrl) {
             channel = channelInUrl;
         }
+
+        var hosturl = 'https://www.ilaw66.com/jasmine/';
+        function returhostname() {
+            var hostweb = location.protocol;
+            var hostname = location.hostname;
+            if (hostname === 'www-ilaw66-com.mipcdn.com' || hostname === 'www.ilaw66.com') {
+                hosturl = 'https://www.ilaw66.com/jasmine/';
+                if (hostname === 'www-ilaw66-com.mipcdn.com') {
+                    channel = 'baidusearch';
+                }
+            }
+            else if (hostname === 'localhost') {
+                var hostport = location.port;
+                hosturl = 'http://' + hostname + ':' + hostport + '/jasmine/';
+            }
+            else {
+                hosturl = 'https://' + hostname + '/jasmine/';
+            }
+        }
+        returhostname();
+        function locahost(topsurl, toptitle) {
+            if (topsurl === './') {
+                topsurl = 'baidusearch';
+            }
+
+            var topurl = hosturl + topsurl;
+            if (MIP.viewer.isIframed) {
+                MIP.viewer.sendMessage('loadiframe', {
+                    title: toptitle,
+                    click: '',
+                    url: topurl
+                });
+            }
+            else {
+                location.assign(topurl);
+            }
+        }
+
+        console.log(hosturl);
 
         setTimeout(function () {
             $el.find('.loading_pop').hide();
@@ -78,7 +117,7 @@ define(function (require) {
             $el.find('.common_number').text('');
         }
         else if (channel === 'baidusearch' || channel === 'baidu_xzh') {
-            $el.find('.header_block').html('准备咨询');
+            $el.find('.header_block .headertitle').html('准备咨询');
             $el.find('.header_block').css('color', '#000');
             $el.find('.header_block').css('background', '#fff');
             $el.find('.glyphicon').css('color', '#000000');
@@ -605,13 +644,43 @@ define(function (require) {
         });
 
         function login() {
-            var action = window.location.origin + '/jasmine/login';
-            var frmLogin = $el.find('#frmLogin form');
-            $(frmLogin).attr('action', action);
-            $(frmLogin).attr('method', 'post');
-            $(frmLogin).attr('target', '_self');
+
+            if (channel === 'baidusearch') {
+                var phone = $el.find('#username').val();
+                if (check(phone)) {
+                    var smsCode = $el.find('#password').val();
+                    $.ajax({
+                        type: 'POST',
+                        url: hosturl + 'baidusearch/login?username=' + phone + '&channel='
+                        + channel + '&password=' + smsCode,
+                        success: function (data) {
+                            if (data.status === 0 && data.data.isLogin === 1) {
+                                locahost('./', '电话咨询');
+                            }
+
+                        },
+                        error: function (jqXHR) {
+                            if (jqXHR.status === 500) {
+                                $el.find('#sendSMSError_msg').text(jqXHR.responseJSON.data);
+                                $el.find('.popUp_sysErr').fadeIn();
+                                //                 		 	console.log(jqXHR.responseJSON.data)
+                            }
+
+                        }
+
+                    });
+                }
+            }
+            else {
+                var action = window.location.origin + '/jasmine/login';
+                var frmLogin = $el.find('#frmLogin form');
+                $(frmLogin).attr('action', action);
+                $(frmLogin).attr('method', 'post');
+                $(frmLogin).attr('target', '_self');
+                $(frmLogin).submit();
+            }
+
             sessionStorage.clear('ishomeorder');
-            $(frmLogin).submit();
         }
 
         function sendSms() {
@@ -633,7 +702,7 @@ define(function (require) {
                 /** 发送短信*/
                 $.ajax({
                     type: 'GET',
-                    url: 'sendSms?phone=' + phone + '&channel=' + channel + '&_csrf=' + csrfToken,
+                    url: hosturl + 'sendSms?phone=' + phone + '&channel=' + channel + '&_csrf=' + csrfToken,
                     success: function (data) {
                         if (data === 'ERROR') {
                             $el.find('#sendSMSError_msg').text('发送短信失败');
@@ -693,7 +762,8 @@ define(function (require) {
             $.ajax({
                 async: true,
                 type: 'POST',
-                url: 'updateUserPhoneNumber?phoneNumber=' + phone + '&smsCode=' + smsCode + '&_csrf=' + csrfToken,
+                url: hosturl + 'updateUserPhoneNumber?phoneNumber=' + phone
+                    + '&smsCode=' + smsCode + '&_csrf=' + csrfToken,
                 dataType: 'json',
                 success: function (data) {
                     if (data.code === 1) {

@@ -20,49 +20,48 @@ define(function (require) {
         var sec = dateTime.getSeconds();
         var timer;
         var lawyerId;
-
-        /*
-         var temp = {};
-         temp.list = [];
-         temp.list.push({
-         value: 0,
-         name: '某律师0',
-         identifyPhoto: 'http://images.ilaw66.com/images/authorize/banner_new_first.png'
-         });
-         temp.list.push({
-         value: 1,
-         name: '某律师1',
-         identifyPhoto: 'http://images.ilaw66.com/images/authorize/banner_new_first.png'
-         });
-         var tempHtml = "";
-         tempHtml +='<mip-carousel '
-         +'autoplay '
-         +'layout="responsive" '
-         +'width="60" '
-         +'height="60">';
-         var tempHtmlN = "";
-         tempHtmlN +='<mip-carousel '
-         +'autoplay '
-         +'layout="responsive" '
-         +'width="60" '
-         +'height="33">';
-         temp.list.forEach(function (item) {
-         tempHtml += '<mip-img class="mip_img" width="60" height="60"'
-         +' src="'+item.identifyPhoto+'"></mip-img>';
-         tempHtmlN += '<p>' + item.name + '</p>';
-         });
-         tempHtml +='</mip-carousel>';
-         tempHtmlN +='</mip-carousel>';
-         $el.find('#mip-template-lawyerImg').html(tempHtml);
-         $el.find('#mip-template-lawyerName').html(tempHtmlN);
-         */
-
-        /*$el.find(".toast_txt").text('取消晚了,律师正在联系您');
-         $el.find(".toast_div").show();
-         setTimeout(function () {
-         $el.find(".toast_div").hide();
-         }, 2000);*/
-
+        var sessionId = getQueryString('sessionId');
+        var MIP = window.MIP;
+        setTimeout(function () {
+            sessionId = $el.find('#sesiid').html();
+            console.log(sessionId);
+        }, 1000);
+        var hosturl = 'https://www.ilaw66.com/jasmine/';
+        function returhostname() {
+            var hostweb = location.protocol;
+            var hostname = location.hostname;
+            if (hostname === 'www-ilaw66-com.mipcdn.com' || hostname === 'www.ilaw66.com') {
+                hosturl = 'https://www.ilaw66.com/jasmine/';
+            }
+            else if (hostname === 'localhost') {
+                var hostport = location.port;
+                hosturl = 'http://' + hostname + ':' + hostport + '/jasmine/';
+            }
+            else {
+                hosturl = 'https://' + hostname + '/jasmine/';
+            }
+        }
+        returhostname();
+        console.log(hosturl);
+        function locahost(topsurl, toptitle) {
+            if (topsurl === './') {
+                topsurl = 'baidusearch';
+            }
+            var topurl = hosturl + topsurl;
+            if (MIP.viewer.isIframed) {
+                MIP.viewer.sendMessage('loadiframe', {
+                    title: toptitle,
+                    click: '',
+                    url: topurl
+                });
+            }
+            else {
+                location.assign(topurl);
+            }
+        }
+        if (sessionStorage.getItem('baiduquestionType')) {
+            sessionStorage.clear('baiduquestionType');
+        }
         $el.find('.jingxuan_top').css('background-image', 'url("images/bg_jingxuanlvshi.png")');
         $el.find('.jingxuan_top>img').attr('src', 'images/bg_touxiangjx.png');
 
@@ -83,7 +82,8 @@ define(function (require) {
         }, 1000);
         // 取消按钮事件
         $el.find('.cancelBtn').click(function () {
-            window.top.location.href = './'; // 取消跳转至首页
+            //          window.top.location.href = './'; // 取消跳转至首页
+            locahost('./', '电话咨询');
         });
         // 取消咨询, 头部返回按钮
         $el.find('.tocancle').click(function () {
@@ -150,13 +150,15 @@ define(function (require) {
             var askingType = $el.find('#askingType').val();
             if (countdown > 60) {
                 clearInterval(timer);
-                window.top.location.href = 'mipilaw66baidu_lawyer_noresponse?questionType=' + questionType;
+                var norurl = 'mipilaw66baidu_lawyer_noresponse?questionType='
+                    + questionType + '&sessionId=' + sessionId;
+                locahost(norurl, '律师未回应');
             }
             else {
                 if (countdown % 5 === 0) {
                     $.ajax({
                         type: 'GET',
-                        url: 'timer?id=' + id,
+                        url: hosturl + 'timer?id=' + id + '&sessionId=' + sessionId,
                         dataType: 'json',
                         success: function (data) {
                             //                      	debugger
@@ -165,19 +167,21 @@ define(function (require) {
                                 || dataStatus === 7 || dataStatus === 8
                                 || dataStatus === 11 || dataStatus === 12) {
                                 clearInterval(timer);
-                                var url = encodeURI(
+                                var urls = encodeURI(
                                     'mipilaw66baidu_linking?questionType=' + questionType + '&lawyerName='
                                     + data.lawyerName + '&requestId=' + id + '&askingType='
                                     + askingType + '&lawyerId=' + data.lawyerId + '&tel='
-                                    + data.tel + '&goodCommentRate=' + data.goodCommentRate);
-                                window.top.location.href = url;
+                                    + data.tel + '&goodCommentRate=' + data.goodCommentRate
+                                    + '&sessionId=' + sessionId);
+                                locahost(urls, '分秒律师');
                             }
                             else if (dataStatus === 4 || dataStatus === 1 || dataStatus === 3
                                 || dataStatus === 9 || dataStatus === 10
                                 || dataStatus === 'ERROR' || dataStatus === 'ERROR1') {
                                 clearInterval(timer);
-                                window.top.location.href = 'mipilaw66baidu_lawyer_noresponse?questionType='
-                                    + questionType;
+                                var lawnoresurl = 'mipilaw66baidu_lawyer_noresponse?questionType='
+                                    + questionType + '&sessionId=' + sessionId;
+                                locahost(lawnoresurl, '律师未回应');
                             }
 
                         },
@@ -193,7 +197,8 @@ define(function (require) {
         }
         function cancelRequestOr() {
             $.ajax({
-                url: 'cancelRequest?requestId=' + $el.find('#requestId').val() + '&_csrf=' + $el.find('#_csrf').val(),
+                url: hosturl + 'cancelRequest?requestId=' + $el.find('#requestId').val() + '&_csrf='
+                    + $el.find('#_csrf').val() + '&sessionId=' + sessionId,
                 type: 'POST',
                 success: function (data) {
                     if (data === 'NG') {
@@ -265,10 +270,12 @@ define(function (require) {
         }
         function gobackHandle() {
             if (!parseInt(sessionStorage.getItem('loginFlg'), 10) && sessionStorage.getItem('loginFlg') === '0') {
-                window.top.location.href = 'login';
+                var tologinurl = 'mipilaw66baidu_login?channel=baidusearch&sessionId=' + sessionId;
+                locahost(tologinurl, '准备咨询');
             }
             else {
-                window.top.location.href = './';
+                //              window.top.location.href = './';
+                locahost('./', '电话咨询');
             }
         }
         function getLawyerImgs() {
@@ -276,10 +283,45 @@ define(function (require) {
             temp.list = [];
             $.ajax({
                 type: 'post',
-                url: 'lawyerOnlines?_csrf=' + $el.find('#_csrf').val()
-                    + '&questionType=' + getQueryString('questionType'),
+                url: hosturl + 'lawyerOnlines?_csrf=' + $el.find('#_csrf').val()
+                    + '&questionType=' + getQueryString('questionType') + '&sessionId=' + sessionId,
                 async: false,
                 success: function (data) {
+//                  var data = data.data;
+//                  if (!data || data.length === 0) {
+//                  // no lawyer msg
+//                  }
+//                  else {
+//                      for (var h = 0; h < data.length; h++) {
+//                          var a = data[h];
+//                          temp.list.push({
+//                              name: a.name,
+//                              identifyPhoto: a.identifyPhoto
+//                          });
+//                      }
+//                      var tempHtml = '';
+//                      tempHtml += '<mip-carousel '
+//                          + 'autoplay '
+//                          + 'layout="responsive" '
+//                          + 'width="60" '
+//                          + 'height="60">';
+//                      var tempHtmlN = '';
+//                      tempHtmlN += '<mip-carousel '
+//                          + 'autoplay '
+//                          + 'layout="responsive" '
+//                          + 'width="60" '
+//                          + 'height="60">';
+//                      temp.list.forEach(function (item) {
+//                          tempHtml += '<mip-img class="mip_img" width="60" height="60"'
+//                              + ' src="' + item.identifyPhoto + '"></mip-img>';
+//                          tempHtmlN += '<p>' + item.name + '</p>';
+//                      });
+//                      tempHtml += '</mip-carousel>';
+//                      tempHtmlN += '</mip-carousel>';
+//                      $el.find('#mip-template-lawyerImg').html(tempHtml);
+//                      $el.find('#mip-template-lawyerName').html(tempHtmlN);
+//                  }
+
                     var data = data.data;
                     if (!data || data.length === 0) {
                     // no lawyer msg
@@ -297,22 +339,14 @@ define(function (require) {
                             + 'autoplay '
                             + 'layout="responsive" '
                             + 'width="60" '
-                            + 'height="60">';
-                        var tempHtmlN = '';
-                        tempHtmlN += '<mip-carousel '
-                            + 'autoplay '
-                            + 'layout="responsive" '
-                            + 'width="60" '
-                            + 'height="60">';
+                            + 'height="110">';
                         temp.list.forEach(function (item) {
-                            tempHtml += '<mip-img class="mip_img" width="60" height="60"'
-                                + ' src="' + item.identifyPhoto + '"></mip-img>';
-                            tempHtmlN += '<p>' + item.name + '</p>';
+                            tempHtml += '<a  href="javascript:;"><mip-img class="mip_img" width="59" height="60"'
+                                + ' src="' + item.identifyPhoto + '"></mip-img>'
+                                + ' <div class="mip-carousle-subtitle">' + item.name + '</div></a>';
                         });
                         tempHtml += '</mip-carousel>';
-                        tempHtmlN += '</mip-carousel>';
                         $el.find('#mip-template-lawyerImg').html(tempHtml);
-                        $el.find('#mip-template-lawyerName').html(tempHtmlN);
                     }
                 },
                 error: function (jqXHR) {

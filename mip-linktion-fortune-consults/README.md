@@ -20,6 +20,11 @@ mip-linktion-fortune-consults ajax移动端弹框提交表单，pc端下滑卡�
         }
     </script>
   </mip-data>
+  <div class="details-iframe">
+    <mip-video src="https://gss0.bdstatic.com/-b1Caiqa0d9Bmcmop9aC2jh9h2w8e4_h7sED0YQ_t9iCPK/mda-gjkt21pkrsd8ae5y/mda-gjkt21pkrsd8ae5y.mp4"></mip-video>
+  </div>
+
+    </div>
   <div class="col-lg-4 col-xs-12 col-sm-4 consult-box">
     <div class="person-card consult-box" data-plannerid="1" data-productid="6"  data-consulturl="http://www.caifu.org/product/consult">
       <div class="click-lightbox slide-up">
@@ -54,11 +59,11 @@ mip-linktion-fortune-consults ajax移动端弹框提交表单，pc端下滑卡�
         </form>
       </div>
       <div class="recommend-icon">
-        <mip-img src=""></mip-img>
+        <mip-img src="img.png"></mip-img>
       </div>
       <div class="card-box">
         <div class="person-icon">
-          <mip-img src=""></mip-img>
+          <mip-img src="img.png"></mip-img>
         </div>
         <div class="info-text">
           <div class="text-name">
@@ -81,14 +86,14 @@ mip-linktion-fortune-consults ajax移动端弹框提交表单，pc端下滑卡�
         <a href="javascript:;" class="but-about">了解TA</a>
         <!-- <a class="but-advisory " href="javascript:return false;" onclick="return false;">咨询中</a> -->
         <!-- 这部分是咨询TA按钮，分不同的状态。把ID改成modal-consult是登录后的弹框，现在是未登录的咨询TA弹框-->
-        <a class="but-advisory">咨询TA</a>
+        <a class="but-advisory hide-video">咨询TA</a>
       </div>
       <div class="card-phone-but">
         <a href="javascript:;" class="but-about" on="tap:modal-consult.toggle tap:MIP.setData({plannerid:1,productid:6})" id="" role="button" tabindex="0">咨询TAp</a>
 
         <!-- 未登录用户的咨询TA弹框 -->
         <!-- <a href=javascript:;"" class="but-about" on="tap:modal-consult-visitor.toggle" id="" role="button" tabindex="0">咨询TA</a> -->
-        <a href="javascript:;" on="tap:planner-more.toggle" id="" role="button" tabindex="0"  class="but-advisory">换一位理财师</a>
+        <a href="javascript:;" on="tap:planner-more.toggle" id="" role="button" tabindex="0"  class="but-advisory hide-video">换一位理财师</a>
       </div>
     </div>
   </div>
@@ -126,11 +131,11 @@ mip-linktion-fortune-consults ajax移动端弹框提交表单，pc端下滑卡�
         </mip-form>
       </div>
       <div class="recommend-icon">
-        <mip-img src=""></mip-img>
+        <mip-img src="img.png"></mip-img>
       </div>
       <div class="card-box">
         <div class="person-icon">
-          <mip-img src=""></mip-img>
+          <mip-img src="img.png"></mip-img>
         </div>
         <div class="info-text">
           <div class="text-name">

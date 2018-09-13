@@ -1,12 +1,14 @@
 # mip-qf-infinitescroll mip-七风-无限滚动组件。
 
-当用户滚动到页面底部时，异步加载更多数据，包含湖南七风的下载逻辑。
+当用户滚动到页面底部时，异步加载更多数据，可配合湖南七风的下载逻辑组件一起使用。
 
 标题|内容
 ----|----
 类型|通用
 支持布局|responsive, fixed-height, fill, container, fixed
-所需脚本|https://c.mipcdn.com/static/v1/mip-infinitescroll/mip-qf-infinitescroll.js<br/> https://c.mipcdn.com/static/v1/mip-mustache/mip-mustache.js
+所需脚本|
+https://c.mipcdn.com/static/v1/mip-mustache/mip-mustache.js<br/>
+https://c.mipcdn.com/static/v1/mip-qf-infinitescroll/mip-qf-infinitescroll.js<br/>
 
 ## 示例
 
@@ -14,15 +16,13 @@
 
 - `data-url` jsonp 请求 url。
 - `gap` (可选)触发滚动回调的距离，单位px。
-- `ipa-prefix-mb` ios 越狱包手机百度下载地址前缀。
-- `ipa-prefix-nonmb` ios 越狱包非手机百度下载地址前缀。
 - `timeout` (可选) jsonp 超时时间。
 - `txt-completed` (可选) 加载完毕按钮文本。
 - `txt-failed` (可选) 加载失败按钮文本。
 - `txt-loading` (可选) 正在加载按钮文本。
 
 ```html
-<mip-qf-infinitescroll data-url="https://mtest.119you.com/fgame/game/ranking" gap="200" ipa-prefix-mb="guide/mbInstruction.shtml?link=/" ipa-prefix-nonmb="guide/usInstruction.shtml?link=/" timeout="5" txt-completed="完毕orz" txt-failed="失败(￣(工)￣)" txt-loading="努力加载...">
+<mip-qf-infinitescroll data-url="https://mtest.119you.com/fgame/game/ranking" gap="200" timeout="5">
     <script type="application/json">
         {
             "columns": "downloadlink,name",
@@ -33,13 +33,20 @@
     </script>
     <template type="mip-mustache">
         <li>
-            <span>{{itemnum}}: {{name}}</span>
-            {{#downloadlink}}<a class="btn-download" href="https://mtest.119you.com/{{downloadlink}}">下载按钮</a>{{/downloadlink}}
-            {{^downloadlink}}<a class="btn-download btn-disabled" href="javascript:void(0)">下载按钮</a>{{/downloadlink}}
+            <span>{{itemnum}} {{name}}</span><br>
+            <span>apk：{{apkHref}}</span><br>
+            <span>ipa: {{ipaHref}}</span>
+            <mip-img src="https://mip.119you.com/upload/resources/image/2018/09/10/369221_120x120.jpg?1536573125000"></mip-img>
         </li>
     </template>
-    <ul></ul>
-    <button class="mip-qf-infinitescroll-btn">加载更多</button>
+    <ul>
+        <li>
+            <span>第一个元素节点为 li，itemNum 计数'li'标签</span><br>
+        </li>
+        <p>p 标签:itemnum 不计数</p>
+    </ul>
+    <div class="mip-qf-infinitescroll-buffer"></div>
+    <button class="mip-qf-infinitescroll-btn" txt-completed="完毕" txt-failed="失败" txt-loading="努力加载...">加载更多</button>
 </mip-qf-infinitescroll>
 ```
 

@@ -646,7 +646,7 @@ define(function (require) {
         function onchangeEvent(arrArea) {
             var str = '';
             for (var i = 0; i < arrArea.length; i++) {
-                str = str + '<option value="' + i + '">' + arrArea[i] + '</option>';
+                str = str + '<option value="' + arrArea[i] + '">' + arrArea[i] + '</option>';
             }
             return str;
         }
@@ -654,12 +654,12 @@ define(function (require) {
         $city.innerHTML = onchangeEvent(cityLevel[0]);
         $county.innerHTML = onchangeEvent(countyLevel[0]);
         $province.onchange = function () {
-            $city.innerHTML = onchangeEvent(cityLevel[this.value]);
-            $county.innerHTML = onchangeEvent(countyLevel[this.value][0]);
+            $city.innerHTML = onchangeEvent(cityLevel[this.selectedIndex]);
+            $county.innerHTML = onchangeEvent(countyLevel[this.selectedIndex][0]);
         };
         $city.onchange = function () {
-            var firstValue =  $province.value;
-            $county.innerHTML = onchangeEvent(countyLevel[firstValue][this.value]);
+            var firstValue =  $province.selectedIndex;
+            $county.innerHTML = onchangeEvent(countyLevel[firstValue][this.selectedIndex]);
         };
     };
     return customElement;

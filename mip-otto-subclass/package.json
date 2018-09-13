@@ -1,0 +1,14 @@
+{
+    "name": "mip-otto-subclass",
+    "version": "1.0.2",
+    "description": "网校地区页功能，问题排查，编译似乎有问题，重新上传",
+    "contributors": [
+        {
+            "name": "xinbao",
+            "email": "fa@ijust.cc"
+        }
+    ],
+    "engines": {
+        "mip": ">=1.1.0"
+    }
+}

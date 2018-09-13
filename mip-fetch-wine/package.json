@@ -1,0 +1,14 @@
+{
+    "name": "mip-fetch-wine",
+    "version": "1.0.0",
+    "description": "根据酒庄的Id异步加载酒庄的相关酒款",
+    "contributors": [
+        {
+            "name": "chenwenkai",
+            "email": "1084072318@qq.com"
+        }
+    ],
+    "engines": {
+        "mip": ">=1.1.0"
+    }
+}

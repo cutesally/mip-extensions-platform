@@ -1,0 +1,12 @@
+{
+    "name": "mip-ilaw66baidutwo-login",
+    "version": "1.0.9",
+    "description": "法率网百度登录页",
+       "contributors": [{
+        "name": "jessli",
+        "email": "306651535@qq.com"
+    }],
+    "engines": {
+        "mip": ">=1.1.0"
+    }
+}

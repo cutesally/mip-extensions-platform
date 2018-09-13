@@ -22,8 +22,47 @@ define(function (require) {
         var questionType = getQueryString('questionType');
         var RUN_ON_BOCOMM_APP = localStorage.getItem('RUN_ON_BOCOMM_APP');
         // 加载获取requestId
+        var MIP = window.MIP;
         var requestId = getQueryString('requestId');
+        var sessionId = getQueryString('sessionId');
+//      setTimeout(function () {
+//          sessionId = $el.find('#sesiid').html();
+//          console.log(sessionId);
+//      }, 1000);
+        var hosturl = 'https://www.ilaw66.com/jasmine/';
+        function returhostname() {
+            var hostweb = location.protocol;
+            var hostname = location.hostname;
+            if (hostname === 'www-ilaw66-com.mipcdn.com' || hostname === 'www.ilaw66.com') {
+                hosturl = 'https://www.ilaw66.com/jasmine/';
+            }
+            else if (hostname === 'localhost') {
+                var hostport = location.port;
+                hosturl = 'http://' + hostname + ':' + hostport + '/jasmine/';
+            }
+            else {
+                hosturl = 'https://' + hostname + '/jasmine/';
+            }
+        }
+        returhostname();
+        console.log(hosturl);
+        function locahost(topsurl, toptitle) {
+            if (topsurl === './') {
+                topsurl = 'baidusearch';
+            }
 
+            var topurl = hosturl + topsurl;
+            if (MIP.viewer.isIframed) {
+                MIP.viewer.sendMessage('loadiframe', {
+                    title: toptitle,
+                    click: '',
+                    url: topurl
+                });
+            }
+            else {
+                location.assign(topurl);
+            }
+        }
         $el.find('#requestId').val(requestId);
 
         // 如果是微信登入,获取微信验证code
@@ -33,7 +72,8 @@ define(function (require) {
             $el.find('.back__pop').show();
             // “狠心离开”按钮回到首页
             $el.find('#js-back-leave').click(function () {
-                window.top.location.href = './';
+                //              window.top.location.href = './';
+                locahost('./', '电话咨询');
             });
             // “继续支付”按钮事件
             $el.find('#js-back-continue').click(function () {
@@ -76,9 +116,10 @@ define(function (require) {
                 async: false,
                 type: 'GET',
                 data: {
-                    requestIdList: getQueryString('requestId')
+                    requestIdList: getQueryString('requestId'),
+                    sessionId: sessionId
                 },
-                url: 'checkFreeBill',
+                url: hosturl + 'checkFreeBill',
                 success: function (data) {
                     if (data.result === '2') {
                         freeFlg = '2';
@@ -99,7 +140,8 @@ define(function (require) {
             if (freeFlg === '2') {
                 //              toastOr(freeMessage);
                 setTimeout(function () {
-                    window.top.location.href = 'orderlist';
+                    //                  window.top.location.href = 'orderlist';
+                    locahost('./', '电话咨询');
                 }, 2000);
                 return;
             }
@@ -123,20 +165,34 @@ define(function (require) {
                     data.requestId = $el.find('#requestId').val();
                 }
                 data._csrf = $el.find('#_csrf').val();
-                data.questionType = $el.find('#questionType').val();
-                data.questionType = 'CT001';
+                data.questionType = questionType;
+                //              data.questionType = 'CT001';
                 data.userCouponId = $el.find('#couponId').val();
+                var hostnames = location.hostname;
+                var payhosturl;
+                if (hostnames === 'www-ilaw66-com.mipcdn.com') {
+                    payhosturl = 'https://m.baidu.com/mip/c/s/www.ilaw66.com/jasmine/';
+                }
+                else {
+                    payhosturl = hosturl;
+                }
+                var encodeurl = encodeURIComponent('mipilaw66baidu_order?requestId='
+                + $el.find('#requestId').val() + '&questionType=' + questionType
+                + '&sessionId=' + sessionId + '&paystart=1');
+                data.returnUrl = payhosturl + encodeurl;
                 if ($el.find('#cardId').val()) {
                     data.cardId = $el.find('#cardId').val();
-                }
+                };
 
                 $.ajax({
                     type: 'POST',
-                    url: 'pay/baidupay',
+                    url: hosturl + 'pay/baidupay?sessionId=' + sessionId,
                     data: data,
                     success: function (data) {
+
                         if (data && data.cashier_url) {
                             window.top.location.href = data.cashier_url;
+                        //                          locahost(data.cashier_url, '电话咨询');
                         }
                         else {
                             $el.find('.popUp_sysErr').fadeIn();
@@ -155,7 +211,6 @@ define(function (require) {
         });
 
         function load() {
-
             // 用户手动操作 cardId:卡券Id cardType:卡券类型 ifUseCard:是否使用卡
             var cardId = $el.find('#cardId').val();
 
@@ -205,7 +260,7 @@ define(function (require) {
 
             $.ajax({
                 type: 'GET',
-                url: url,
+                url: hosturl + url + '&sessionId=' + sessionId,
                 success: function (data) {
                     var totalAmount = data.totalAmount;
                     var duration = data.duration;
@@ -299,11 +354,12 @@ define(function (require) {
 
                 // 获取订单orderId
                 data.orderId = requestId;
+                data.sessionId = sessionId;
 
                 /*$el.find("#pay__pop").hide();*/
                 $.ajax({
+                    url: hosturl + 'card/updateOrderWithCard',
                     type: 'POST',
-                    url: 'card/updateOrderWithCard',
                     data: data,
                     success: function (data) {
                         // -1:连接异常，
@@ -349,9 +405,10 @@ define(function (require) {
                 if (channel === 'cmbc') {
                     $.ajax({
                         type: 'GET',
-                        url: 'activity/getLotteryTimes',
+                        url: hosturl + 'activity/getLotteryTimes',
                         data: {
-                            activityId: 'msfp'
+                            activityId: 'msfp',
+                            sessionId: sessionId
                         },
                         success: function (data) {
                             var chanceNum = data.data.times;
@@ -430,10 +487,11 @@ define(function (require) {
         function getCheckPay(id, questionType) {
             $.ajax({
                 type: 'get',
-                url: 'check/' + id,
+                url: hosturl + 'check/' + id + '&sessionId=' + sessionId,
                 success: function (msg) {
                     if (msg === 'OK') {
-                        window.top.location.href = 'comment?requestId=' + id + '&questionType=' + questionType;
+                        window.top.location.href = 'comment?requestId=' + id
+                            + '&questionType=' + questionType + '&sessionId=' + sessionId;
                     }
                     else {
                         //                      toastOr('支付失败，请重新支付');
@@ -453,9 +511,10 @@ define(function (require) {
         function checkTalking(requestId) {
             $.ajax({
                 type: 'GET',
-                url: 'checkTalkingOrder',
+                url: hosturl + 'checkTalkingOrder',
                 data: {
-                    requestId: requestId
+                    requestId: requestId,
+                    sessionId: sessionId
                 },
                 success: function (data) {
                     console.log(data);

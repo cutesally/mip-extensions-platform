@@ -1,0 +1,14 @@
+{
+    "name": "mip-typecho-comment",
+    "version": "1.0.4",
+    "description": "修正登陆状态下出现意外跳转的异常。",
+    "contributors": [
+        {
+            "name": "Zhao Zhiping",
+            "email": "izzhip@qq.com"
+        }
+    ],
+    "engines": {
+        "mip": ">=1.1.0"
+    }
+}

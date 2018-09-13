@@ -1,0 +1,14 @@
+{
+    "name": "mip-qqy-yuyue",
+    "version": "1.0.2",
+    "description": "去去游手机预约组件",
+    "contributors": [
+        {
+            "name": "cyb",
+            "email": "415204@qq.com"
+        }
+    ],
+    "engines": {
+        "mip": ">=1.1.0"
+    }
+}

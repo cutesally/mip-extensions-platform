@@ -9,7 +9,7 @@ define(function (require) {
     var md5 = require('./md5.min');
     var util = require('util');
     var platform = util.platform;
-    var videoLog =  {
+    var videoLog = {
         status: {
             init: false,
             waiting: false
@@ -125,10 +125,8 @@ define(function (require) {
                             // Data of 0% is replace by play times
                             if (i !== 0) {
                                 var data = {
-                                    currentTime: videoEl.currentTime,
                                     cent: (i / videoLog.sectionNum) * 100 + '%',
-                                    videoSrc: urlData.videoSrc,
-                                    url: urlData.url
+                                    videoSrc: urlData.videoSrc
                                 };
                                 self.sendLog('section', data);
                             }
@@ -139,17 +137,22 @@ define(function (require) {
             // Play end statistics separately
             videoEl.addEventListener('ended', function () {
                 var data = {
-                    currentTime: videoEl.currentTime,
+                    videoSrc: urlData.videoSrc,
                     cent: '100%'
                 };
                 self.sendLog('section', data);
+            });
+            // Error log
+            videoEl.addEventListener('error', function () {
+                var data = videoEl.error;
+                data.videoSrc = urlData.videoSrc;
+                self.sendLog('error', data);
             });
         },
         getNetwork: function () {
             var self = this;
             var ua = videoLog.ua;
-            var isSearchCraft = /SearchCraft/i.test(navigator.userAgent);
-            if (isSearchCraft) {
+            if (self.isSearchCraft()) {
                 self.getNetworkSearchCraft();
             }
             else if (ua.isBaiduApp()) {
@@ -190,6 +193,10 @@ define(function (require) {
             }
             return res;
         },
+        isSearchCraft: function () {
+            var isSearchCraft = /SearchCraft/i.test(navigator.userAgent);
+            return isSearchCraft;
+        },
         // 获取手百的网络状态
         getNetworkBaidubox: function () {
             location.assign(videoLog.getNetworkType);
@@ -198,7 +205,7 @@ define(function (require) {
         getNetworkSearchCraft: function () {
             var self = this;
             var ua = videoLog.ua;
-            if (!ua.isSearchCraft() || ua.isSearchCraft() && !self.versionCompare('2.9')) {
+            if (!self.isSearchCraft() || self.isSearchCraft() && !self.versionCompare('2.9')) {
                 return;
             }
             var msg = {
@@ -331,14 +338,41 @@ define(function (require) {
                         });
                     break;
                 case 'section':
-                    self.webb2.send('pf_comm', {
-                        cent: data.cent,
-                        currentTime: data.currentTime,
-                        url: data.url,
-                        videoSrc: data.videoSrc
-                    }, function () {}, {
-                        group: 'searchVideo-mip'
-                    });
+                    self.webb2.sendPfLog(
+                        // info
+                        {
+                            cent: data.cent
+                        },
+                        // dim
+                        {
+                            net: videoLog.network,
+                            type: 'thirdparty-cent'
+                        },
+                        // ext
+                        {
+                            ext: {
+                                videoSrc: data.videoSrc
+                            }
+                        });
+                    break;
+                case 'error':
+                    self.webb2.sendExceptionLog(
+                        // info
+                        {
+                            code: data.code,
+                            message: data.message
+                        },
+                        // dim
+                        {
+                            net: videoLog.network
+                        },
+                        // ext
+                        {
+                            ext: {
+                                videoSrc: data.videoSrc
+                            }
+                        }
+                    );
                     break;
             }
         }

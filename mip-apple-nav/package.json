@@ -1,0 +1,14 @@
+{
+    "name": "mip-apple-nav",
+    "version": "1.3.0",
+    "description": "苹果导航栏,更新了手机端导航展开样式",
+    "contributors": [
+        {
+            "name": "mickey",
+            "email": "787440432@qq.com"
+        }
+    ],
+    "engines": {
+        "mip": ">=1.4.0"
+    }
+}
